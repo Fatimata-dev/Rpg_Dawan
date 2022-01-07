@@ -18,16 +18,25 @@ public class Personnage {
     private final static double DEFENSE_A_AJOUTER_A_CHAQUE_NIVEAU = 7.0;
     private final static double HP_A_AJOUTER_A_CHAQUE_NIVEAU = 20.0;
 
-    public Personnage(String nom, int hp, int force, int defense, double mana, Panoplie panoplie) {
+    public Personnage(String nom, double hp, Panoplie panoplie) {
         this.xp = 0.0;
         this.partXp = 0.0;
         this.timeToDefeat = 0;
         this.nom = nom;
         this.hp = hp;
         this.hpRestants = hp;
-        this.force = force;
-        this.defense = defense;
         this.panoplie = panoplie;
+        for (Item i : panoplie.getItems()) {
+            if (i.getType() == TypeStat.DEFENSE) {
+                this.defense += i.getCapacite();
+            }
+            else if (i.getType() == TypeStat.FORCE) {
+                this.force += i.getCapacite();
+            }
+            else {
+                this.hp += i.getCapacite();
+            }
+        }
         this.Niveau = 1;
     }
 
@@ -72,10 +81,11 @@ public class Personnage {
         }
     }
 
-    public void attaquer(Item item, Personnage p) {
+    public boolean attaquer(Item item, Personnage p) {
         this.timeToDefeat++;
         double coupCritique = Math.random() + 1;
-        p.hpRestants = p.defense - (this.force + item.getCapacite())*coupCritique;
+        p.hpRestants = p.defense - item.getCapacite()*coupCritique;
+        System.out.println(p.hpRestants);
         if (p.hpRestants <= 0) {
             System.out.println("Le personnage " + this.nom + " a gagné le combat !");
             System.out.println("Veuillez choisir une stat à faire évoluer (0: FORCE, 1: DEFENSE, 2: HP)");
@@ -83,7 +93,9 @@ public class Personnage {
             TypeStat stat = TypeStat.values()[sc.nextInt()];
             addStatistiques(stat);
             reduceStatistiques(p);
+            return true;
         }
+        return false;
     }
 
     private void reduceStatistiques(Personnage p) {
@@ -105,11 +117,13 @@ public class Personnage {
         this.timeToDefeat = 0;
     }
 
-    public void fuir() {
+    public boolean fuir() {
         double chanceToFlee = Math.random()*timeToDefeat;
         if (chanceToFlee > 1) {
             System.out.println("Le personnage s'est enfuit !");
             restore();
+            return true;
         }
+        return false;
     }
 }

@@ -12,4 +12,12 @@ public class Item {
     public double getCapacite() {
         return capacite;
     }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public TypeStat getType() {
+        return type;
+    }
 }
