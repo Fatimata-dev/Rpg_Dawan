@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class Panoplie {
+public class Panoplie implements Serializable {
     private List<Item> items;
     private final static int NB_MAX_ITEMS = 5;
 

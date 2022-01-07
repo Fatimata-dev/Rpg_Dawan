@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Personnage {
+public class Personnage implements Serializable {
     private String nom;
     private double xp;
     private double partXp;
@@ -13,13 +14,14 @@ public class Personnage {
     private Panoplie panoplie;
     private int Niveau;
     private final static double XP_GAGNES_A_CHAQUE_VICTOIRE = 30.0;
+    private final static double XP_DE_DEPART = 100.0;
     private final static double XP_A_AJOUTER_A_CHAQUE_NIVEAU = 5.0;
     private final static double FORCE_A_AJOUTER_A_CHAQUE_NIVEAU = 3.0;
     private final static double DEFENSE_A_AJOUTER_A_CHAQUE_NIVEAU = 7.0;
     private final static double HP_A_AJOUTER_A_CHAQUE_NIVEAU = 20.0;
 
     public Personnage(String nom, double hp, Panoplie panoplie) {
-        this.xp = 0.0;
+        this.xp = XP_DE_DEPART;
         this.partXp = 0.0;
         this.timeToDefeat = 0;
         this.nom = nom;
@@ -38,6 +40,38 @@ public class Personnage {
             }
         }
         this.Niveau = 1;
+    }
+
+    public double getXp() {
+        return xp;
+    }
+
+    public double getPartXp() {
+        return partXp;
+    }
+
+    public double getHp() {
+        return hp;
+    }
+
+    public double getForce() {
+        return force;
+    }
+
+    public double getDefense() {
+        return defense;
+    }
+
+    public int getNiveau() {
+        return Niveau;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public double getHpRestants() {
+        return hpRestants;
     }
 
     public Panoplie getPanoplie() {
@@ -84,8 +118,7 @@ public class Personnage {
     public boolean attaquer(Item item, Personnage p) {
         this.timeToDefeat++;
         double coupCritique = Math.random() + 1;
-        p.hpRestants = p.defense - item.getCapacite()*coupCritique;
-        System.out.println(p.hpRestants);
+        p.hpRestants = p.hpRestants + p.defense - item.getCapacite()*coupCritique;
         if (p.hpRestants <= 0) {
             System.out.println("Le personnage " + this.nom + " a gagné le combat !");
             System.out.println("Veuillez choisir une stat à faire évoluer (0: FORCE, 1: DEFENSE, 2: HP)");
@@ -93,6 +126,9 @@ public class Personnage {
             TypeStat stat = TypeStat.values()[sc.nextInt()];
             addStatistiques(stat);
             reduceStatistiques(p);
+            afficherNiveau();
+            afficherStats();
+            this.restore();
             return true;
         }
         return false;
@@ -108,6 +144,7 @@ public class Personnage {
     private void addStatistiques(TypeStat stat) {
         this.partXp += XP_GAGNES_A_CHAQUE_VICTOIRE/timeToDefeat;
         if (this.partXp > this.xp) {
+            System.out.println("test");
             augmenterNiveau(stat);
         }
     }
@@ -125,5 +162,19 @@ public class Personnage {
             return true;
         }
         return false;
+    }
+
+    public void afficherStats() {
+        System.out.println(this.nom + " a " + this.partXp + " de points d'expérience, " + this.defense + " de défense, " +
+                this.force + " de force et " + this.hp + " de points de vie !");
+    }
+
+    public void afficherNiveau() {
+        System.out.println(this.nom + " est au niveau " + this.Niveau);
+    }
+
+    @Override
+    public String toString() {
+        return this.nom + " " + this.Niveau + " " + this.xp + " " + this.hp + " " + this.defense + " " + this.force;
     }
 }
